@@ -31,7 +31,7 @@ class TextNode:
         # return text_equal and type_equal and url_equal            
         return(
             self.text == other.text
-            and self.text_type.value == other.text_type.value 
+            and self.text_type == other.text_type
             and self.url == other.url
         )
     
