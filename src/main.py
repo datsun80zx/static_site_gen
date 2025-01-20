@@ -1,4 +1,5 @@
 from textnode import TextNode, TextType
+from leafnode import LeafNode
 
 def main ():
 
@@ -22,7 +23,7 @@ def main ():
     print("\nCode text Node:")
     print(code_text)
 
-    image = TextNode("this is an image", TextType.IMAGE,)
+    image = TextNode("this is an image", TextType.IMAGE,'www.exampleurl.com')
     print("\nImages:")
     print(image)
 
@@ -30,6 +31,53 @@ def main ():
     print("\nTesting equality...")
     print(f"Are the plain text nodes equal? {plain_text == duplicate_plain}")
     print(f"Are different nodes equal? {plain_text == bold_text}")
+
+def text_node_to_html_node(text_node):
+    if isinstance(text_node, TextNode):
+        if text_node.text_type == TextType.TEXT:
+            return LeafNode(
+                None,
+                f'{text_node.text}',
+                None,
+            )
+        elif text_node.text_type == TextType.BOLD:
+            return LeafNode(
+                'b',
+                f'{text_node.text}',
+                None,
+            )
+        elif text_node.text_type == TextType.ITALIC:
+            return LeafNode(
+                'i',
+                f'{text_node.text}',
+                None,
+            )
+        elif text_node.text_type == TextType.CODE:
+            return LeafNode(
+                'code',
+                f'{text_node.text}',
+                None,
+            )
+        elif text_node.text_type == TextType.LINK:
+            return LeafNode(
+                'a',
+                f'{text_node.text}',
+                {
+                    'href': text_node.url,
+                },
+            )
+        elif text_node.text_type == TextType.IMAGE:
+            return LeafNode(
+                'img',
+                '',
+                {
+                    'src': text_node.url,
+                    'alt': text_node.text,
+                },
+            )
+    else:
+        raise Exception('Invalid TextType')
+            
 
 
 if __name__ == "__main__":
