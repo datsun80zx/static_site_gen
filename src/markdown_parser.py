@@ -1,3 +1,4 @@
+import re
 from textnode import TextNode, TextType
 
 
@@ -30,29 +31,22 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
 
     return new_nodes
 
+def extract_markdown_images(text):
+    images = re.findall(r"!\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
+    good_images = []
+    bad_images = []
+    for tuple in images:
+        if tuple[0] != '' and tuple[1] != '':
+            good_images.append(tuple)
+        elif tuple[0] == '' or tuple[1] == '':
+            bad_images.append(tuple)
+    
+    return good_images
 
-    
-    
-    
-    
-    
-    
-    
-    # new_nodes = []
-    # delimiters = {
-    #     '**': TextType.BOLD,
-    #     '*': TextType.ITALIC,
-    #     '`': TextType.CODE,
-    # }
-    # if text_type == TextType.TEXT:
-    #     for delimiter in delimiters:
-    #         if delimiter in old_nodes:
-    #             text_list = old_nodes.text.split(delimiter)
-    #         if len(text_list) == 3:
-    #             new_nodes.extend(
-    #                 [
-    #                     TextNode(text_list[0], TextType.TEXT),
-    #                     TextNode(text_list[1], delimiters[delimiter]),
-    #                     TextNode(text_list[2], TextType.TEXT),
-    #                 ]
-    #             )
+def extract_markdown_links(text):
+    links = re.findall(r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
+    good_links = []
+    for tuple in links:
+        if tuple[1] != '':
+            good_links.append(tuple)
+    return good_links
