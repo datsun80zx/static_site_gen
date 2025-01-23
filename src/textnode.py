@@ -19,16 +19,7 @@ class TextNode:
     def __eq__(self, other):
         if not isinstance(other, TextNode):
             return False
-        
-        # text_equal = self.text == other.text
-        # type_equal = self.text_type == other.text_type
-        # url_equal = self.url == other.url
-        
-        # print(f"Text comparison: {text_equal} ({self.text} == {other.text})")
-        # print(f"Type comparison: {type_equal} ({self.text_type} == {other.text_type})")
-        # print(f"URL comparison: {url_equal} ({self.url} == {other.url})")
-        
-        # return text_equal and type_equal and url_equal            
+           
         return(
             self.text == other.text
             and self.text_type == other.text_type
