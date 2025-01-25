@@ -5,6 +5,9 @@ from textnode import TextNode, TextType
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
     new_nodes = []
 
+    if not isinstance(old_nodes, list):
+        old_nodes = [old_nodes]
+
     for node in old_nodes:
         if node.text_type != TextType.TEXT:
             new_nodes.append(node)
@@ -33,6 +36,10 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
 
 def split_nodes_images(old_nodes):
     new_nodes = []
+    
+    if not isinstance(old_nodes, list):
+        old_nodes = [old_nodes]
+    
     for node in old_nodes:
         # if the TextType is something besides text just add the node to the new list. 
         if node.text_type != TextType.TEXT:
@@ -80,6 +87,10 @@ def split_nodes_images(old_nodes):
 
 def split_nodes_links(old_nodes):
     new_nodes = []
+    
+    if not isinstance(old_nodes, list):
+        old_nodes = [old_nodes]
+
     for node in old_nodes:
         # if the TextType is something besides text just add the node to the new list. 
         if node.text_type != TextType.TEXT:
@@ -144,3 +155,15 @@ def extract_markdown_links(text):
         if tuple[1] != '':
             good_links.append(tuple)
     return good_links
+
+def text_to_textnodes(text):
+    node = TextNode(text, TextType.TEXT)
+
+    nodes = split_nodes_delimiter(node, '**', TextType.BOLD)
+    nodes = split_nodes_delimiter(nodes, '*', TextType.ITALIC)
+    nodes = split_nodes_delimiter(nodes, '`', TextType.CODE)
+    nodes = split_nodes_images(nodes)
+    nodes = split_nodes_links(nodes)
+
+    return nodes
+
