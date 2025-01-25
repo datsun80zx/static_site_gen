@@ -5,6 +5,8 @@ from markdown_parser import (
     extract_markdown_links,
     extract_markdown_images,
     split_nodes_delimiter,
+    split_nodes_images,
+    split_nodes_links
 )
 
 class TestMarkdownParser(unittest.TestCase):
@@ -77,4 +79,57 @@ class TestMarkdownParser(unittest.TestCase):
                 [('', 'empty.com')],
             ],
             'this should show that images are properly handled'
+        )
+
+    def test_split_images(self):
+        node1 = TextNode("This is an ![image](https://i.imgur.com/123.png) in text.", TextType.TEXT)
+        node2 = TextNode("![first](img1.png) Some text ![second](img2.png)", TextType.TEXT)
+        node3 = TextNode("![img1](url1)![img2](url2)![img3](url3)", TextType.TEXT)
+        node4 = TextNode("![start](url1) middle text ![end](url2)", TextType.TEXT)
+        node5 = TextNode("Start ![img1](url1) middle ![img2](url2) end", TextType.TEXT)
+        node6 = TextNode("![preserved](url)", TextType.IMAGE, "url")
+
+        test_cases = [
+            node1,
+            node2, 
+            node4,
+            node6,
+        ]
+        self.assertEqual(
+            split_nodes_images(test_cases), 
+            [
+                TextNode('This is an ', TextType.TEXT),
+                TextNode('image', TextType.IMAGE, 'https://i.imgur.com/123.png'),
+                TextNode(' in text.', TextType.TEXT),
+                TextNode('first', TextType.IMAGE, 'img1.png'),
+                TextNode(' Some text ', TextType.TEXT),
+                TextNode('second', TextType.IMAGE, 'img2.png'),
+                TextNode('start', TextType.IMAGE, 'url1'),
+                TextNode(' middle text ', TextType.TEXT),
+                TextNode('end', TextType.IMAGE, 'url2'),
+                TextNode("![preserved](url)", TextType.IMAGE, "url"),
+            ]
+        )
+
+    def test_split_links(self):
+        node2 = TextNode("This is a [link](https://boot.dev) in text.", TextType.TEXT)
+        node4 = TextNode("[link1](url1.com) middle [link2](url2.com)", TextType.TEXT)
+        node6 = TextNode("[link1](url1)[link2](url2)[link3](url3)", TextType.TEXT)
+
+        test_cases = [
+            node2,
+            node4,
+        
+        ]
+
+        self.assertEqual(
+            split_nodes_links(test_cases), 
+            [
+                TextNode('This is a ', TextType.TEXT),
+                TextNode('link', TextType.LINK, 'https://boot.dev'),
+                TextNode(' in text.', TextType.TEXT),
+                TextNode('link1', TextType.LINK, 'url1.com'),
+                TextNode(' middle ', TextType.TEXT),
+                TextNode('link2', TextType.LINK, 'url2.com'),
+            ]
         )
