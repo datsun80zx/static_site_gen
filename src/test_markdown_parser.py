@@ -8,6 +8,8 @@ from markdown_parser import (
     split_nodes_images,
     split_nodes_links,
     text_to_textnodes,
+    markdown_to_blocks,
+    block_to_block_type
 )
 
 class TestMarkdownParser(unittest.TestCase):
@@ -153,4 +155,91 @@ class TestMarkdownParser(unittest.TestCase):
                 TextNode("link", TextType.LINK, "https://boot.dev"),
             ]
         )
-        
+
+    def test_markdown_to_blocks(self):
+        test1 = '# Heading\n\nThis is a paragraph.\n\n* List item 1\n* List item 2'
+        test2 = '# Heading\n\n\n Paragraph with spaces\n\n\n\n\n* List'
+        test3 = '\n\n\n# Starting with blanks\n\nMiddle\n\nEnding with blanks\n\n'
+
+        result1 = [
+            '# Heading', 
+            'This is a paragraph.', 
+            '* List item 1\n* List item 2',
+        ]
+        result2 = [
+            '# Heading', 
+            'Paragraph with spaces', 
+            '* List',
+        ]
+        result3 = [
+            '# Starting with blanks', 
+            'Middle', 
+            'Ending with blanks',
+        ]
+
+        self.assertEqual(markdown_to_blocks(test1), result1, "This should show that normal cases are handled well.")
+        self.assertEqual(markdown_to_blocks(test2), result2, "This should show that randomly spaced lines are handled")
+        self.assertEqual(markdown_to_blocks(test3), result3, "This should show that beginning and ending blank lines are handled.")
+
+    def test_block_to_blocktypes(self):
+        paragraph = 'here is some text that I am turning into a paraghraph.\nI am doing this to test the function I am about to write.\nI despise unit testing however it is a necessary evil.'
+        headings1 = '# Header 1'
+        headings2 = '## Header 2'
+        headings3 = '### Header 3'
+        headings4 = '#### Header 4'
+        headings5 = '##### Header 5'
+        headings6 = '###### Header 6'
+        code = '```Here is some text that is supposed to be read as code```'
+        quote = '> This is supposed to be a quote'
+        unordered_list = '* this is supposed to indicate a list item'
+        unordered_list1 = '- this is also supposed to indicate a list item'
+        ordered_list = '1. This is an ordered list.\n2. With two items.'
+        ordered_list1 = '1. This is an ordered list with one item.'
+
+        test1 = paragraph
+        test3 = code
+        test4 = quote
+        self.assertEqual(block_to_block_type(test1), 'paragraph', 'Indicates paragraphs are handled well.')
+        self.assertEqual(
+            [
+                block_to_block_type(headings1),
+                block_to_block_type(headings2),
+                block_to_block_type(headings3),
+                block_to_block_type(headings4),
+                block_to_block_type(headings5),
+                block_to_block_type(headings6),
+            ], 
+            [
+                'Heading 1', 
+                'Heading 2', 
+                'Heading 3', 
+                'Heading 4', 
+                'Heading 5', 
+                'Heading 6'
+            ], 
+            'Indicates Headings are handled.'
+        )
+        self.assertEqual(block_to_block_type(test3), 'code', 'indicates code is handled well.')
+        self.assertEqual(block_to_block_type(test4), 'quote', 'indicates quotes are handled.')
+        self.assertEqual(
+            [
+                block_to_block_type(unordered_list),
+                block_to_block_type(unordered_list1),
+            ],
+            [
+                'unordered list',
+                'unordered list',
+            ],
+            'indicates u_lists are handled'
+        )
+        self.assertEqual(
+            [
+                block_to_block_type(ordered_list),
+                block_to_block_type(ordered_list1),
+            ],
+            [
+                'ordered list',
+                'ordered list',
+            ],
+            'indicates u_lists are handled'
+        )

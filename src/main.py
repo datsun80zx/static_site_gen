@@ -1,19 +1,12 @@
 from textnode import TextNode, TextType
 from leafnode import LeafNode
-from markdown_parser import split_nodes_images, extract_markdown_images
+from markdown_parser import markdown_to_blocks
 
 def main ():
 
+    raw_markdown = '# This is a heading\n\nThis is a paragraph of text. It has some **bold** and *italic* words inside of it.\n\n* This is the first list item in a list block\n* This is a list item\n* This is another list item'
 
-    node = [
-        TextNode(
-                    "This is text with a link ![to boot dev](https://www.boot.dev) and ![to youtube](https://www.youtube.com/@bootdotdev)",
-                    TextType.TEXT,
-                )
-    ]        
-
-    new_nodes = split_nodes_images(node)
-    print(new_nodes)
+    markdown_to_blocks(raw_markdown)
 
 
     # plain_text = TextNode("Hello World", TextType.TEXT)

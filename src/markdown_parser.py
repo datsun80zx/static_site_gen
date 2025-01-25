@@ -167,3 +167,36 @@ def text_to_textnodes(text):
 
     return nodes
 
+def markdown_to_blocks(markdown):
+    blocks = markdown.split('\n\n')
+    final = []
+    for block in blocks:
+        tmp = block.strip()
+        if tmp != '':
+            final.append(tmp)
+            continue
+    return final
+
+def block_to_block_type(block):
+    block_types = {
+        '# ': 'Heading 1',
+        '## ': 'Heading 2',
+        '### ': 'Heading 3',
+        '#### ': 'Heading 4',
+        '##### ': 'Heading 5',
+        '###### ': 'Heading 6',
+        '>': 'quote',
+        '* ': 'unordered list',
+        '- ': 'unordered list',
+    }
+    for type in block_types:
+        if block.startswith(type):
+            return block_types[type]
+        
+    if block.startswith('```') and block.endswith('```'):
+        return 'code'
+    elif block.startswith('1. '):
+        return 'ordered list'
+    else:
+        return 'paragraph'   
+
