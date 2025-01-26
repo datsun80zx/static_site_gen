@@ -7,6 +7,7 @@ class TextType(Enum):
     CODE = auto()
     LINK = auto()
     IMAGE = auto()
+    QUOTE = auto()
 
 
 
