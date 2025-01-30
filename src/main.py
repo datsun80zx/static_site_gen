@@ -1,12 +1,17 @@
 from textnode import TextNode, TextType
 from htmlnode import LeafNode
-from markdown_parser import markdown_to_blocks
+from markdown_parser import markdown_to_blocks, block_to_block_type
 
 def main ():
 
-    raw_markdown = '# This is a heading\n\nThis is a paragraph of text. It has some **bold** and *italic* words inside of it.\n\n* This is the first list item in a list block\n* This is a list item\n* This is another list item'
+    code = """```
+        Here is some text that is supposed to be read as code
+        ```"""
 
-    markdown_to_blocks(raw_markdown)
+    test = block_to_block_type(code)
+
+    print(test)
+    
 
 if __name__ == "__main__":
     main()

@@ -168,35 +168,60 @@ def text_to_textnodes(text):
     return nodes
 
 def markdown_to_blocks(markdown):
-    blocks = markdown.split('\n\n')
-    final = []
+    blocks = markdown.split("\n\n")
+    filtered_blocks = []
     for block in blocks:
-        tmp = block.strip()
-        if tmp != '':
-            final.append(tmp)
+        if block == "":
             continue
-    return final
+        block = block.strip()
+        filtered_blocks.append(block)
+    return filtered_blocks
 
 def block_to_block_type(block):
-    block_types = {
-        '# ': 'Heading 1',
-        '## ': 'Heading 2',
-        '### ': 'Heading 3',
-        '#### ': 'Heading 4',
-        '##### ': 'Heading 5',
-        '###### ': 'Heading 6',
-        '>': 'quote',
-        '* ': 'unordered list',
-        '- ': 'unordered list',
+    headings = {
+        '# ': 'h1',
+        '## ': 'h2',
+        '### ': 'h3',
+        '#### ': 'h4',
+        '##### ': 'h5',
+        '###### ': 'h6',
     }
-    for type in block_types:
-        if block.startswith(type):
-            return block_types[type]
-        
-    if block.startswith('```') and block.endswith('```'):
-        return 'code'
-    elif block.startswith('1. '):
-        return 'ordered list'
+    block_type_paragraph = "p"
+    block_type_code = "code"
+    block_type_quote = "blockquote"
+    block_type_ol = "ol"
+    block_type_ul = "ul"
+
+    lines = block.split("\n")
+    for heading in headings:
+        if block.startswith(heading):
+            return headings[heading]
+    if block.startswith("```") and block.endswith("```"):
+        return block_type_code
+    if len(lines) > 1 and lines[0].startswith('```') and lines[-1].startswith('```'):
+        return block_type_code
+    if block.startswith(">"):
+        for line in lines:
+            if not line.startswith(">"):
+                return block_type_paragraph
+        return block_type_quote
+    if block.startswith("* "):
+        for line in lines:
+            if not line.startswith("* "):
+                return block_type_paragraph
+        return block_type_ul
+    if block.startswith("- "):
+        for line in lines:
+            if not line.startswith("- "):
+                return block_type_paragraph
+        return block_type_ul
+    if block.startswith("1. "):
+        i = 1
+        for line in lines:
+            if not line.startswith(f"{i}. "):
+                return block_type_paragraph
+            i += 1
+        return block_type_ol
     else:
-        return 'paragraph'   
+        return block_type_paragraph   
 

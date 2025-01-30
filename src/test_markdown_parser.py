@@ -157,29 +157,78 @@ class TestMarkdownParser(unittest.TestCase):
         )
 
     def test_markdown_to_blocks(self):
-        test1 = '# Heading\n\nThis is a paragraph.\n\n* List item 1\n* List item 2'
-        test2 = '# Heading\n\n\n Paragraph with spaces\n\n\n\n\n* List'
-        test3 = '\n\n\n# Starting with blanks\n\nMiddle\n\nEnding with blanks\n\n'
+        md = """
+This is **bolded** paragraph
 
-        result1 = [
-            '# Heading', 
-            'This is a paragraph.', 
-            '* List item 1\n* List item 2',
-        ]
-        result2 = [
-            '# Heading', 
-            'Paragraph with spaces', 
-            '* List',
-        ]
-        result3 = [
-            '# Starting with blanks', 
-            'Middle', 
-            'Ending with blanks',
-        ]
+This is another paragraph with *italic* text and `code` here
+This is the same paragraph on a new line
 
-        self.assertEqual(markdown_to_blocks(test1), result1, "This should show that normal cases are handled well.")
-        self.assertEqual(markdown_to_blocks(test2), result2, "This should show that randomly spaced lines are handled")
-        self.assertEqual(markdown_to_blocks(test3), result3, "This should show that beginning and ending blank lines are handled.")
+* This is a list
+* with items
+"""
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(
+            blocks,
+            [
+                "This is **bolded** paragraph",
+                "This is another paragraph with *italic* text and `code` here\nThis is the same paragraph on a new line",
+                "* This is a list\n* with items",
+            ],
+        )
+
+    def test_markdown_to_blocks_newlines(self):
+        md = """
+This is **bolded** paragraph
+
+
+
+
+This is another paragraph with *italic* text and `code` here
+This is the same paragraph on a new line
+
+* This is a list
+* with items
+"""
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(
+            blocks,
+            [
+                "This is **bolded** paragraph",
+                "This is another paragraph with *italic* text and `code` here\nThis is the same paragraph on a new line",
+                "* This is a list\n* with items",
+            ],
+        )
+
+
+#         test1 = """
+# # Heading
+
+# This is a paragraph.
+
+# * List item 1
+# * List item 2"""
+#         test2 = '# Heading\n\n\n Paragraph with spaces\n\n\n\n\n* List'
+#         test3 = '\n\n\n# Starting with blanks\n\nMiddle\n\nEnding with blanks\n\n'
+
+#         result1 = [
+#             '# Heading', 
+#             'This is a paragraph.', 
+#             '* List item 1\n* List item 2',
+#         ]
+#         result2 = [
+#             '# Heading', 
+#             'Paragraph with spaces', 
+#             '* List',
+#         ]
+#         result3 = [
+#             '# Starting with blanks', 
+#             'Middle', 
+#             'Ending with blanks',
+#         ]
+
+#         self.assertEqual(markdown_to_blocks(test1), result1, "This should show that normal cases are handled well.")
+#         self.assertEqual(markdown_to_blocks(test2), result2, "This should show that randomly spaced lines are handled")
+#         self.assertEqual(markdown_to_blocks(test3), result3, "This should show that beginning and ending blank lines are handled.")
 
     def test_block_to_blocktypes(self):
         paragraph = 'here is some text that I am turning into a paraghraph.\nI am doing this to test the function I am about to write.\nI despise unit testing however it is a necessary evil.'
@@ -189,7 +238,10 @@ class TestMarkdownParser(unittest.TestCase):
         headings4 = '#### Header 4'
         headings5 = '##### Header 5'
         headings6 = '###### Header 6'
-        code = '```Here is some text that is supposed to be read as code```'
+        code = """```
+        Here is some text that is supposed to be read as code
+        ```"""
+
         quote = '> This is supposed to be a quote'
         unordered_list = '* this is supposed to indicate a list item'
         unordered_list1 = '- this is also supposed to indicate a list item'
@@ -199,7 +251,7 @@ class TestMarkdownParser(unittest.TestCase):
         test1 = paragraph
         test3 = code
         test4 = quote
-        self.assertEqual(block_to_block_type(test1), 'paragraph', 'Indicates paragraphs are handled well.')
+        self.assertEqual(block_to_block_type(test1), 'p', 'Indicates paragraphs are handled well.')
         self.assertEqual(
             [
                 block_to_block_type(headings1),
@@ -210,25 +262,26 @@ class TestMarkdownParser(unittest.TestCase):
                 block_to_block_type(headings6),
             ], 
             [
-                'Heading 1', 
-                'Heading 2', 
-                'Heading 3', 
-                'Heading 4', 
-                'Heading 5', 
-                'Heading 6'
+                'h1', 
+                'h2', 
+                'h3', 
+                'h4', 
+                'h5', 
+                'h6'
             ], 
             'Indicates Headings are handled.'
         )
+        
         self.assertEqual(block_to_block_type(test3), 'code', 'indicates code is handled well.')
-        self.assertEqual(block_to_block_type(test4), 'quote', 'indicates quotes are handled.')
+        self.assertEqual(block_to_block_type(test4), 'blockquote', 'indicates quotes are handled.')
         self.assertEqual(
             [
                 block_to_block_type(unordered_list),
                 block_to_block_type(unordered_list1),
             ],
             [
-                'unordered list',
-                'unordered list',
+                'ul',
+                'ul',
             ],
             'indicates u_lists are handled'
         )
@@ -238,8 +291,8 @@ class TestMarkdownParser(unittest.TestCase):
                 block_to_block_type(ordered_list1),
             ],
             [
-                'ordered list',
-                'ordered list',
+                'ol',
+                'ol',
             ],
             'indicates u_lists are handled'
         )
