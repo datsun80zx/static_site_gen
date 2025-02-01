@@ -1,17 +1,19 @@
-from textnode import TextNode, TextType
-from htmlnode import LeafNode
-from markdown_parser import markdown_to_blocks, block_to_block_type
+import os
+from copystatic import prepare_destination_directory, directory_copy
 
 def main ():
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(current_dir)
 
-    code = """```
-        Here is some text that is supposed to be read as code
-        ```"""
+    source = os.path.join(project_root, "static")
+    destination = os.path.join(project_root, "public")
 
-    test = block_to_block_type(code)
+    print(f"preparing to delete destination directory...")
 
-    print(test)
-    
+    prepare_destination_directory(destination)
+    directory_copy(source, destination)
+
+
 
 if __name__ == "__main__":
     main()
