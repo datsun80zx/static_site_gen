@@ -86,6 +86,13 @@ def markdown_format_stripper(block): # this function really only handles headers
     if block.startswith('```') and block.endswith('```'):
         return block.strip('```')
 
+def extract_title(markdown):
+    lines = markdown.split("\n")
+    for line in lines:
+        if line.startswith("# "):
+            return line.strip("# ").strip()
+    raise Exception("No Header")
+
 def olist_parser(block):
     items = block.split("\n")
     html_items = []

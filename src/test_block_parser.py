@@ -1,6 +1,6 @@
 import unittest
 
-from block_parser import markdown_to_html_node
+from block_parser import markdown_to_html_node, extract_title
 
 class TestBlockParser(unittest.TestCase):
     def test_block_parser(self):
@@ -117,3 +117,24 @@ this is paragraph text
             html,
             "<div><blockquote>This is a blockquote block</blockquote><p>this is paragraph text</p></div>",
         )
+
+    def test_extract_title(self):
+        test0 = "# Hello\nsome content"
+        test1 = "some content\n# Hello\nmore content"
+        test2 = "#    Lots of spaces    "
+        test3 = "No header here\njust content"
+
+        result0 = "Hello"
+        result1 = "Hello"
+        result2 = "Lots of spaces"
+        
+        self.assertEqual(extract_title(test0), result0)
+        self.assertEqual(extract_title(test1), result1)
+        self.assertEqual(extract_title(test2), result2)
+        
+        try:
+            extract_title(test3)
+            assert False, "Should have raised an exception"
+        except Exception:
+            pass
+
